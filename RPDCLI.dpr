@@ -1,11 +1,13 @@
 program RPDCLI;
 
 // Reksadata Performance Data Collector Command Line Version
-// Version 2.5.0.3
+// Version 2.5.0.5
 // Copyright ©2016-2020, PT. Reksa Data Indonesia (Release to Public - Apache License 2.0)
-// Purpose: Windows Performance Data Collector Setup and Cleaning Up
-// Download the binary from http://awssg.reksadata.net/binary/rditools.zip
-// Download the how-to-use doc from http://awssg.reksadata.net/doc/RPDC_Quick_Start.pdf
+// Purpose: Windows Performance Data Collector Setup, Ops and Cleaning Up
+// Download the code from https://github.com/syuaip/rpdcli
+// Download the binary from github above or from http://awssg.reksadata.net/binary/rditools.zip
+// How-to-use doc: TBA (on this github)
+// How-to-use video: TBA (on Youtube)
 
 {$APPTYPE CONSOLE}
 
