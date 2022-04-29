@@ -11,7 +11,7 @@ program RPDCLI;
 // Purpose: Windows Performance Data Collector Setup, Ops and Cleaning Up
 // Download the code from https://github.com/syuaip/rpdcli
 // Download the binary from github above or from http://awssg.reksadata.net/binary/rditools.zip
-// How-to-use doc: TBA (on github)
+// How-to-use doc: https://github.com/syuaip/rpdcli/blob/master/README.md
 // How-to-use video: TBA (on Youtube)
 // Compile with Delphi 7.0 Ultimate 4.453
 
