@@ -1,13 +1,19 @@
 program RPDCLI;
 
 // Reksadata Performance Data Collector Command Line Version
-// Version 2.5.0.5
-// Copyright ©2016-2020, PT. Reksa Data Indonesia (Release to Public - Apache License 2.0)
+// Version 2.5.1
+//   Change version text from corp to name.
+//   Cover SSAS 2019 counters.
+//   Enable function: FileContent
+//   Added -debug parameter to allow temp and report files not to be deleted for examination 
+// Copyright ©2016-2020, PT. Reksa Data Indonesia (Decommisioned)
+// Copyright ©2020-2022, Arief Nugraha (Release to Public - Apache License 2.0)
 // Purpose: Windows Performance Data Collector Setup, Ops and Cleaning Up
 // Download the code from https://github.com/syuaip/rpdcli
 // Download the binary from github above or from http://awssg.reksadata.net/binary/rditools.zip
-// How-to-use doc: TBA (on this github)
+// How-to-use doc: TBA (on github)
 // How-to-use video: TBA (on Youtube)
+// Compile with Delphi 7.0 Ultimate 4.453
 
 {$APPTYPE CONSOLE}
 
@@ -161,6 +167,7 @@ begin
                                          Pos(')', Trim(DatFileReader[i]))-Length('SQL Server (')-1
                                        );
                WriteLn('Found installed SQL Instance: '+SQLinstancename);
+               // add SQL Server instance name to array
                tstrSQLServer.Add(SQLinstancename);
              end;
 
@@ -235,6 +242,7 @@ begin
 end;
 
 procedure DeleteDataFiles;
+// removing temp and report files
 begin
     DeleteOneFile('RDIPDC.xml');
     DeleteOneFile('RDIPDC.lck');
@@ -245,7 +253,6 @@ begin
     DeleteOneFile('lmimp.dat');
     DeleteOneFile('lmsta.dat');
     DeleteOneFile('RDIPDC.log');
-    DeleteOneFile('report.html');
     DeleteOneFile('lmsto.dat');
     DeleteOneFile('lmdel.dat');
     DeleteOneFile('mssqlinst.dat');
@@ -320,6 +327,7 @@ begin
                 WriteLn(fileRDIPDCXML, '<Counter>\.NET CLR Memory(_Global_)\*</Counter>');
 
                 If boolIISExist Then Begin
+                   // if MS IIS is detected, add IIS Perf counters
                    WriteLn(fileRDIPDCXML, '<Counter>\Active Server Pages\*</Counter>');
                    WriteLn(fileRDIPDCXML, '<Counter>\ASP.NET\*</Counter>');
                    WriteLn(fileRDIPDCXML, '<Counter>\HTTP Service\*</Counter>');
@@ -341,6 +349,7 @@ begin
                   for i := 0 to tstrSQLServer.Count-1 do begin
                     If (Trim(tstrSQLServer[i]) = 'MSSQLSERVER') Then
                      begin
+                        // add SQL Perf counters for default instance
                         WriteLn(fileRDIPDCXML, '<Counter>\SQLServer:Wait Statistics(*)\*</Counter>');
                         WriteLn(fileRDIPDCXML, '<Counter>\SQLServer:Access Methods\*</Counter>');
                         WriteLn(fileRDIPDCXML, '<Counter>\SQLServer:Buffer Manager\*</Counter>');
@@ -352,6 +361,7 @@ begin
                      end
                     else
                      begin
+                        // add SQL Perf counters for named instance
                         WriteLn(fileRDIPDCXML, '<Counter>\MSSQL$'+Trim(tstrSQLServer[i])+':Wait Statistics(*)\*</Counter>');
                         WriteLn(fileRDIPDCXML, '<Counter>\MSSQL$'+Trim(tstrSQLServer[i])+':Access Methods\*</Counter>');
                         WriteLn(fileRDIPDCXML, '<Counter>\MSSQL$'+Trim(tstrSQLServer[i])+':Buffer Manager\*</Counter>');
@@ -443,6 +453,18 @@ begin
                                 WriteLn(fileRDIPDCXML, '<Counter>\MSAS14:Storage Engine Query\*</Counter>');
                                 WriteLn(fileRDIPDCXML, '<Counter>\MSAS14:Threads\*</Counter>');
 
+                                // SQL 2019
+                                WriteLn(fileRDIPDCXML, '<Counter>\MSAS15:Cache\*</Counter>');
+                                WriteLn(fileRDIPDCXML, '<Counter>\MSAS15:Connection\*</Counter>');
+                                WriteLn(fileRDIPDCXML, '<Counter>\MSAS15:Locks\*</Counter>');
+                                WriteLn(fileRDIPDCXML, '<Counter>\MSAS15:MDX\*</Counter>');
+                                WriteLn(fileRDIPDCXML, '<Counter>\MSAS15:Memory\*</Counter>');
+                                WriteLn(fileRDIPDCXML, '<Counter>\MSAS15:Proc Aggregations\*</Counter>');
+                                WriteLn(fileRDIPDCXML, '<Counter>\MSAS15:Proc Indexes\*</Counter>');
+                                WriteLn(fileRDIPDCXML, '<Counter>\MSAS15:Processing\*</Counter>');
+                                WriteLn(fileRDIPDCXML, '<Counter>\MSAS15:Storage Engine Query\*</Counter>');
+                                WriteLn(fileRDIPDCXML, '<Counter>\MSAS15:Threads\*</Counter>');
+
                                 // bSSASDefaultCountersDeployed = True
                                 // End If
                               End
@@ -471,6 +493,7 @@ begin
                 WriteLn(fileRDIPDCXML, '<CounterDisplayName>\.NET CLR Memory(_Global_)\*</CounterDisplayName>');
 
                 If boolIISExist Then Begin
+                   // if MS IIS is detected, add IIS Perf counters
                    WriteLn(fileRDIPDCXML, '<CounterDisplayName>\Active Server Pages\*</CounterDisplayName>');
                    WriteLn(fileRDIPDCXML, '<CounterDisplayName>\ASP.NET\*</CounterDisplayName>');
                    WriteLn(fileRDIPDCXML, '<CounterDisplayName>\HTTP Service\*</CounterDisplayName>');
@@ -492,6 +515,7 @@ begin
                   for i := 0 to tstrSQLServer.Count-1 do begin
                     If (Trim(tstrSQLServer[i]) = 'MSSQLSERVER') Then
                      begin
+                        // add SQL Perf counters for default instance
                         WriteLn(fileRDIPDCXML, '<CounterDisplayName>\SQLServer:Wait Statistics(*)\*</CounterDisplayName>');
                         WriteLn(fileRDIPDCXML, '<CounterDisplayName>\SQLServer:Access Methods\*</CounterDisplayName>');
                         WriteLn(fileRDIPDCXML, '<CounterDisplayName>\SQLServer:Buffer Manager\*</CounterDisplayName>');
@@ -503,6 +527,7 @@ begin
                      end
                     else
                      begin
+                        // add SQL Perf counters for named instance
                         WriteLn(fileRDIPDCXML, '<CounterDisplayName>\MSSQL$'+Trim(tstrSQLServer[i])+':Wait Statistics(*)\*</CounterDisplayName>');
                         WriteLn(fileRDIPDCXML, '<CounterDisplayName>\MSSQL$'+Trim(tstrSQLServer[i])+':Access Methods\*</CounterDisplayName>');
                         WriteLn(fileRDIPDCXML, '<CounterDisplayName>\MSSQL$'+Trim(tstrSQLServer[i])+':Buffer Manager\*</CounterDisplayName>');
@@ -594,6 +619,18 @@ begin
                                 WriteLn(fileRDIPDCXML, '<CounterDisplayName>\MSAS14:Storage Engine Query\*</CounterDisplayName>');
                                 WriteLn(fileRDIPDCXML, '<CounterDisplayName>\MSAS14:Threads\*</CounterDisplayName>');
 
+                                // SQL 2019
+                                WriteLn(fileRDIPDCXML, '<CounterDisplayName>\MSAS15:Cache\*</CounterDisplayName>');
+                                WriteLn(fileRDIPDCXML, '<CounterDisplayName>\MSAS15:Connection\*</CounterDisplayName>');
+                                WriteLn(fileRDIPDCXML, '<CounterDisplayName>\MSAS15:Locks\*</CounterDisplayName>');
+                                WriteLn(fileRDIPDCXML, '<CounterDisplayName>\MSAS15:MDX\*</CounterDisplayName>');
+                                WriteLn(fileRDIPDCXML, '<CounterDisplayName>\MSAS15:Memory\*</CounterDisplayName>');
+                                WriteLn(fileRDIPDCXML, '<CounterDisplayName>\MSAS15:Proc Aggregations\*</CounterDisplayName>');
+                                WriteLn(fileRDIPDCXML, '<CounterDisplayName>\MSAS15:Proc Indexes\*</CounterDisplayName>');
+                                WriteLn(fileRDIPDCXML, '<CounterDisplayName>\MSAS15:Processing\*</CounterDisplayName>');
+                                WriteLn(fileRDIPDCXML, '<CounterDisplayName>\MSAS15:Storage Engine Query\*</CounterDisplayName>');
+                                WriteLn(fileRDIPDCXML, '<CounterDisplayName>\MSAS15:Threads\*</CounterDisplayName>');
+
                                 // bSSASDefaultCountersDeployed = True
                                 // End If
                               End
@@ -640,7 +677,7 @@ begin
                 WriteLn(fileRDIPDCXML, '	<MaxSize>3000</MaxSize>');
                 WriteLn(fileRDIPDCXML, '	<MaxFolderCount>0</MaxFolderCount>');
                 WriteLn(fileRDIPDCXML, '	<ResourcePolicy>1</ResourcePolicy>');
-                WriteLn(fileRDIPDCXML, '	<ReportFileName>report.html</ReportFileName>');
+                WriteLn(fileRDIPDCXML, '	<ReportFileName>report.html</ReportFileName>');   // created report file upon completion of Perf counters collection
                 WriteLn(fileRDIPDCXML, '	<RuleTargetFileName>report.xml</RuleTargetFileName>');
                 WriteLn(fileRDIPDCXML, '	<EventsFileName>');
                 WriteLn(fileRDIPDCXML, '	</EventsFileName>');
@@ -900,9 +937,9 @@ begin
                 WriteLn(fileRDIPDCXML, '	<StartTime>12:00:00 PM</StartTime>');
                 WriteLn(fileRDIPDCXML, '	<Days>127</Days>');
                 WriteLn(fileRDIPDCXML, '</Schedule>');
-                WriteLn(fileRDIPDCXML, '<DataManager>');
-                WriteLn(fileRDIPDCXML, '	<Enabled>-1</Enabled>');
-                WriteLn(fileRDIPDCXML, '	<CheckBeforeRunning>-1</CheckBeforeRunning>');
+                WriteLn(fileRDIPDCXML, '<DataManager>');                                  // the values here generally works
+                WriteLn(fileRDIPDCXML, '	<Enabled>-1</Enabled>');                        // if/when they dont, please consult Windows administration materials
+                WriteLn(fileRDIPDCXML, '	<CheckBeforeRunning>-1</CheckBeforeRunning>');  // possible reference: https://voyager.deanza.edu/~hso/cis170f/lecture/ch10/win03/data.html
                 WriteLn(fileRDIPDCXML, '	<MinFreeDisk>0</MinFreeDisk>');
                 WriteLn(fileRDIPDCXML, '	<MaxSize>3000</MaxSize>');
                 WriteLn(fileRDIPDCXML, '	<MaxFolderCount>0</MaxFolderCount>');
@@ -931,9 +968,11 @@ begin
 end;
 
 function FileContent(Filename : String; StringContent : String) : Boolean;
-var LineStr : String;
+var LineStr : String; tstrlFileReader : TStringList;
 begin
-  FileContent := True;
+  tstrlFileReader := TStringList.Create;
+  tstrlFileReader.LoadFromFile(Filename);
+  FileContent := Copy(Trim(tstrlFileReader[0]),1,Length(StringContent)) = StringContent;
 end;
 
 procedure RegisterPerfmonXML;
@@ -945,11 +984,11 @@ begin
       Begin
          WriteLn('Collector created.');
          WriteLn('Run with -2 or -start as parameter to start data collection process.');
-         DeleteDataFiles;
+         //  DeleteDataFiles;
       End
    Else
       Begin
-         WriteLn('Collector creation failed. Check the error message on lmimp.dat.');
+         WriteLn('Collector creation failed. Enable debug mode and check the error message on lmimp.dat.');
       End;
 end;
 
@@ -962,13 +1001,13 @@ begin
       Begin
          WriteLn('Collector started.');
          WriteLn('Run with -3 or -stop as parameter to later stop data collection process.');
-         DeleteDataFiles;
+         //  DeleteDataFiles;
       End
    Else
       Begin
          WriteLn('Collector starting failed.');
          WriteLn('Please ensure collection already registered.');
-         WriteLn('Check the error message on lmsta.dat.');
+         WriteLn('Enable debug mode and check the error message on lmsta.dat.');
       End;
 end;
 
@@ -981,13 +1020,13 @@ begin
       Begin
          WriteLn('Collector stopped.');
          WriteLn('Run with -4 or -clean as parameter to remove collector.');
-         DeleteDataFiles;
+         //  DeleteDataFiles;
       End
    Else
       Begin
          WriteLn('Collector stopping failed.');
          WriteLn('Please ensure collection already registered and started.');
-         WriteLn('Check the error message on lmsto.dat.');
+         WriteLn('Enable debug mode and check the error message on lmsto.dat.');
       End;
 end;
 
@@ -1000,13 +1039,13 @@ begin
       Begin
          WriteLn('Collector removed.');
          WriteLn('Run with -1 or -install as parameter to reinstall collector.');
-         DeleteDataFiles;
+         //  DeleteDataFiles;
       End
    Else
       Begin
          WriteLn('Collector removal failed.');
          WriteLn('Please ensure collection exists and on stopped condition.');
-         WriteLn('Check the error message on lmdel.dat.');
+         WriteLn('Enable debug mode and check the error message on lmdel.dat.');
       End;
 end;
 
@@ -1015,11 +1054,11 @@ begin
 
    If IAmIn64Bits Then
      Begin
-       WriteLn('RPDC CLI v' + GetBuildInfoAsString + '/X64 - Copyright (c)2016-2018, PT. Reksa Data Indonesia');
+       WriteLn('RPDC CLI v' + GetBuildInfoAsString + '/X64 - Copyright (c)2016-2022, Arief Nugraha');
      End
     Else
      Begin
-       WriteLn('RPDC CLI v' + GetBuildInfoAsString + '/X86 - Copyright (c)2016-2018, PT. Reksa Data Indonesia');
+       WriteLn('RPDC CLI v' + GetBuildInfoAsString + '/X86 - Copyright (c)2016-2022, Arief Nugraha');
      End;
 
    WriteLn('');
@@ -1076,12 +1115,14 @@ begin
       RemovePerfmonXML;
    End;
 
-   DeleteDataFiles;
+   If (UpperCase(ParamStr(2)) = '-D') OR (UpperCase(ParamStr(2)) = '-DEBUG') Then
+       // do not delete temp and report files
+   Else
+      DeleteDataFiles;
 
    If validParamStr = False Then WriteLn(ParamStr(1) + ' is not a valid paramater');
 
    WriteLn('');
-   WriteLn('Program exiting!');
+   WriteLn('Program exit!');
 end.
-
 
