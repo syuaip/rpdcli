@@ -29,3 +29,7 @@ Tools for Windows Performance Data Collector Setup, Ops and Cleaning Up
     
     c. or checking the BLG file using PAL tool https://github.com/clinthuffman/PAL
 10) Run *rpdcli -4* to remove the data collector.
+
+# How-to-use (video)
+
+https://youtu.be/d8xz5r_b0sQ
