@@ -12,7 +12,7 @@ program RPDCLI;
 // Download the code from https://github.com/syuaip/rpdcli
 // Download the binary from github above or from http://awssg.reksadata.net/binary/rditools.zip
 // How-to-use doc: https://github.com/syuaip/rpdcli/blob/master/README.md
-// How-to-use video: TBA (on Youtube)
+// How-to-use video: https://youtu.be/d8xz5r_b0sQ
 // Compile with Delphi 7.0 Ultimate 4.453
 
 {$APPTYPE CONSOLE}
