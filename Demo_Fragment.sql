@@ -16,7 +16,7 @@ GO
 CREATE TABLE [dbo].[tbl_SAMPLE](
        [USERID] [nchar](10) NULL,
        [TIMEINSERTED] [datetime] NOT NULL,
-       [TOKENS] [numeric](18, 0) NULL
+       [TOKENS] bigint NULL   --- bigint or [numeric](18, 0)] 
 ) ON [PRIMARY]
 
 GO
@@ -25,7 +25,7 @@ GO
 CREATE TABLE [dbo].[tbl_SAMPLE2](
        [USERID] [nchar](10) NULL,
        [TIMEINSERTED] [datetime] NOT NULL,
-       [TOKENS] [numeric](18, 0) NULL,
+       [TOKENS] bigint NULL,   --- bigint or [numeric](18, 0)] 
 	   [FILLER1] [nchar](255) NULL,
 	   [FILLER2] [nchar](255) NULL,
 	   [FILLER3] [nchar](255) NULL,
@@ -46,7 +46,7 @@ GO
 
 
 ----------------------------
---- #2 Add Tables Constraints
+--- #3 Add Tables Constraints
 ----- with below constraints for table 1
 ALTER TABLE [dbo].[tbl_SAMPLE] ADD  CONSTRAINT [DF_Table_1_INSERTED]  DEFAULT (getdate()) FOR [TIMEINSERTED]
 GO
@@ -63,12 +63,12 @@ GO
 
 
 ---------------------------
---- #2 Insert Sample Data. This usually going to take a while. 
------ insert sample data
+--- #4 Insert Sample Data. This usually going to take a while. 
+----- insert sample data (and check SQL Wait on Performance Insight while this is running)
 SET NOCOUNT ON
 GO
 INSERT INTO [dbo].[tbl_SAMPLE] (USERID) VALUES ('Rhoma')
-GO 100000
+GO 10000
 INSERT INTO [dbo].[tbl_SAMPLE] (USERID) VALUES ('Gaby')
 GO 10000
 INSERT INTO [dbo].[tbl_SAMPLE] (USERID) VALUES ('Albert')
@@ -87,7 +87,7 @@ GO 5000
 SET NOCOUNT ON
 GO
 INSERT INTO [dbo].[tbl_SAMPLE2] (USERID) VALUES ('Rhoma')
-GO 100000
+GO 10000
 INSERT INTO [dbo].[tbl_SAMPLE2] (USERID) VALUES ('Gaby')
 GO 10000
 INSERT INTO [dbo].[tbl_SAMPLE2] (USERID) VALUES ('Albert')
@@ -101,9 +101,16 @@ GO 1500
 INSERT INTO [dbo].[tbl_SAMPLE2] (USERID) VALUES ('Farhat')
 GO 5000
 
-
 -------------------------------------------------------
---- #3 Create a Stored Procedure for randomized load intro 
+--- #4B verify space being used by tables. note the row numbers, data and index size
+sp_spaceused tbl_Sample
+GO
+sp_spaceused tbl_Sample2
+GO
+
+
+----#5---------------------------------------------------
+--- #5A Create a Stored Procedure for randomized load intro 
 CREATE PROCEDURE TypicalLoadSample 
 AS
 BEGIN
@@ -127,8 +134,9 @@ IF @Load >= 15 AND @Load < 20  INSERT INTO [dbo].[tbl_SAMPLE] (USERID) VALUES ('
 IF @Load >= 10 AND @Load < 15  DELETE FROM [dbo].[tbl_SAMPLE] WHERE TOKENS = @Load * @Load;
 IF @Load <10 SELECT USERID FROM [dbo].[tbl_SAMPLE] WHERE TOKENS = @Load * @Load;
 END
+GO
 
---- Stored Procedure for randomized load intro for Table 2
+--- #5B Stored Procedure for randomized load intro for Table 2
 CREATE PROCEDURE TypicalLoadSample2 
 AS
 BEGIN
@@ -152,12 +160,12 @@ IF @Load >= 15 AND @Load < 20  INSERT INTO [dbo].[tbl_SAMPLE2] (USERID) VALUES (
 IF @Load >= 10 AND @Load < 15  DELETE FROM [dbo].[tbl_SAMPLE2] WHERE TOKENS = @Load * @Load;
 IF @Load <10 SELECT USERID FROM [dbo].[tbl_SAMPLE2] WHERE TOKENS = @Load * @Load;
 END
-
+GO
 
 
 -------------------------------------------------------
---- #4 Get baseline query performance data
----- Demo SELECT using specific values. Note the number of page reads. It should be big (close to the number of pages above)
+--- #6 Get baseline query performance data
+---- Demo SELECT using specific values. Note the number of page reads. It should be big (close to the number of pages above). Check Query Plan is possible. 
 SET STATISTICS IO ON
 SET STATISTICS XML ON
 SET STATISTICS TIME ON
@@ -172,7 +180,7 @@ SET STATISTICS IO OFF
 SET STATISTICS XML OFF
 SET STATISTICS TIME OFF
 
----- Demo SELECT using specific values. Note the number of page reads. It should be big (close to the number of pages above)
+---- Demo SELECT using specific values. Note the number of page reads. It should be big (close to the number of pages above). Check Query Plan is possible. 
 SET STATISTICS IO ON
 SET STATISTICS XML ON
 SET STATISTICS TIME ON
@@ -190,7 +198,7 @@ SET STATISTICS TIME OFF
 
 
 -------------------------------------------------------
---- #5 Improve performance by creating indexes
+--- #7 Improve performance by creating indexes (Table 1)
 ----- Create indexes to improve query performance
 CREATE CLUSTERED INDEX [idx_TIMEINSERTED] ON [dbo].[tbl_SAMPLE] 
 (
@@ -216,16 +224,8 @@ CREATE NONCLUSTERED INDEX [idx_NAME] ON [dbo].[tbl_SAMPLE]
 GO
 
 
-
 -------------------------------------------------------
---- verify space being used by table and indexes. note the row numbers, data and index size
-sp_spaceused tbl_Sample
-sp_spaceused tbl_Sample2
-
-
-
--------------------------------------------------------
------ Create indexes to improve query performance on Table 2
+----- #8 Create indexes to improve query performance on Table 2
 CREATE CLUSTERED INDEX [idx_TIMEINSERTED] ON [dbo].[tbl_SAMPLE2] 
 (
        [TIMEINSERTED] ASC,
@@ -250,9 +250,16 @@ CREATE NONCLUSTERED INDEX [idx_NAME] ON [dbo].[tbl_SAMPLE2]
 GO
 
 
+-------------------------------------------------------
+--- #9 verify space being used by table and indexes. note the row numbers, data and index size
+sp_spaceused tbl_Sample
+GO
+sp_spaceused tbl_Sample2
+GO
+
 
 -------------------------------------------------------
---- #6 Verify of having no fragmentation yet
+--- #10 Verify of having no fragmentation yet
 --- SHOW FRAGMENTATION. Should be very minimum. Note the number of pages
 DBCC SHOWCONTIG ('tbl_Sample') WITH FAST, TABLERESULTS, ALL_INDEXES, NO_INFOMSGS
 GO 
@@ -261,9 +268,9 @@ GO
 
 
 -------------------------------------------------------
---- #7 Verify no fragmentation yet
+--- #11 Verify no fragmentation yet
 ---- Demo SELECT using same query as above. Note the number of page reads. It has less page reads / faster due to created indexes
----- note the time for processing
+---- note the time for processing. Check Query Plan. 
 SET STATISTICS IO ON
 SET STATISTICS XML ON
 SET STATISTICS TIME ON
@@ -278,9 +285,9 @@ SET STATISTICS IO OFF
 SET STATISTICS XML OFF
 SET STATISTICS TIME OFF
 
----- #8 Get improved query performance data
+---- #12 Get improved query performance data on Table 2
 ---- Demo SELECT using same query as above. Note the number of page reads. It has less page reads / faster due to created indexes
----- note the time for processing
+---- note the time for processing. Check Query Plan. 
 SET STATISTICS IO ON
 SET STATISTICS XML ON
 SET STATISTICS TIME ON
@@ -296,44 +303,60 @@ SET STATISTICS XML OFF
 SET STATISTICS TIME OFF
 
 
----- #9 Storage compression
+--- #13 drop indexes to go with compression demo 
+DROP INDEX [idx_NAME] ON [dbo].[tbl_SAMPLE]
+GO
+DROP INDEX [idx_TIMEINSERTED] ON [dbo].[tbl_SAMPLE]
+GO
+DROP INDEX [idx_TOKENS] ON [dbo].[tbl_SAMPLE]
+GO
+DROP INDEX [idx_NAME] ON [dbo].[tbl_SAMPLE2]
+GO
+DROP INDEX [idx_TIMEINSERTED] ON [dbo].[tbl_SAMPLE2]
+GO
+DROP INDEX [idx_TOKENS] ON [dbo].[tbl_SAMPLE2]
+GO
+
+
+---- #14 Storage compression
 -------------------------------------------------------
 --- Review potential disk space saving by compression
 
-EXEC sp_estimate_data_compression_savings 'DemoFragment', 'tbl_SAMPLE', NULL, NULL, 'ROW' ;  
+EXEC sp_estimate_data_compression_savings 'dbo', 'tbl_SAMPLE', NULL, NULL, 'ROW' ;  
 GO
-EXEC sp_estimate_data_compression_savings 'DemoFragment', 'tbl_SAMPLE', NULL, NULL, 'PAGE' ;  
+EXEC sp_estimate_data_compression_savings 'dbo', 'tbl_SAMPLE', NULL, NULL, 'PAGE' ;  
 GO
-EXEC sp_estimate_data_compression_savings 'DemoFragment', 'tbl_SAMPLE2', NULL, NULL, 'ROW' ;  
+EXEC sp_estimate_data_compression_savings 'dbo', 'tbl_SAMPLE2', NULL, NULL, 'ROW' ;  
 GO
-EXEC sp_estimate_data_compression_savings 'DemoFragment', 'tbl_SAMPLE2', NULL, NULL, 'PAGE' ;  
+EXEC sp_estimate_data_compression_savings 'dbo', 'tbl_SAMPLE2', NULL, NULL, 'PAGE' ;  
 GO
 
 -------------------------------------------------------
----- #10 Enable compression
+---- #15 Enable compression
 	---- Compress table
 		USE [DemoFragment]
 		ALTER TABLE [dbo].[tbl_SAMPLE] REBUILD PARTITION = ALL
 			WITH 
-				(DATA_COMPRESSION = PAGE
+				(DATA_COMPRESSION = PAGE  
 			)
-
+		GO 
 		--- verify space being used by table and indexes. note the row numbers, data and index size. they are smaller.
 		sp_spaceused tbl_Sample
+		GO
 
 		---- Compress table
 		USE [DemoFragment]
 			ALTER TABLE [dbo].[tbl_SAMPLE2] REBUILD PARTITION = ALL
 			WITH 
-				(DATA_COMPRESSION = PAGE
+				(DATA_COMPRESSION = PAGE 
 			)
-
+		GO 
 		--- verify space being used by table and indexes. note the row numbers, data and index size. they are smaller.
 		sp_spaceused tbl_Sample2
-
+		GO
 
 -------------------------------------------------------
-							---- Demo SELECT using same query as above. Same number of page reads but less physical page reads / possibly faster due to compression (need verification)
+							---- #16 Demo SELECT of Table 2 using same query as above. Same number of page reads but less physical page reads / possibly faster due to compression (need verification)
 							---- note the time for processing
 							SET STATISTICS IO ON
 							SET STATISTICS XML ON
@@ -350,7 +373,7 @@ GO
 							SET STATISTICS TIME OFF
 
 
-							---- Demo SELECT using same query as above. Same number of page reads but less physical page reads / possibly faster due to compression (need verification)
+							---- Demo SELECT of Table using same query as above. Same number of page reads but less physical page reads / possibly faster due to compression (need verification)
 							---- note the time for processing
 							SET STATISTICS IO ON
 							SET STATISTICS XML ON
@@ -368,7 +391,37 @@ GO
 
 
 -------------------------------------------------------
----- #11 Remove and insert some data to introduce fragmentation (table 1)
+---- #17 Disable compression
+		USE [DemoFragment]
+		ALTER TABLE [dbo].[tbl_SAMPLE] REBUILD PARTITION = ALL
+			WITH 
+				(DATA_COMPRESSION = NONE 
+			)
+		GO 
+		--- verify space being used by table and indexes. note the row numbers, data and index size. they are smaller.
+		sp_spaceused tbl_Sample
+		GO
+
+		---- Compress table
+		USE [DemoFragment]
+			ALTER TABLE [dbo].[tbl_SAMPLE2] REBUILD PARTITION = ALL
+			WITH 
+				(DATA_COMPRESSION = NONE  
+			)
+		GO 
+		--- verify space being used by table and indexes. note the row numbers, data and index size. they are smaller.
+		sp_spaceused tbl_Sample2
+		GO
+
+
+
+--- #18A 
+-- SHOW FRAGMENTATION.. Should be low 
+DBCC SHOWCONTIG ('tbl_Sample') WITH FAST, TABLERESULTS, ALL_INDEXES, NO_INFOMSGS
+GO 
+
+-------------------------------------------------------
+---- #18B Remove and insert some data to introduce fragmentation (table 1)
 DELETE FROM [dbo].[tbl_SAMPLE] WHERE TOKENS > 20000 AND TOKENS < 55000
 GO
 SET NOCOUNT ON
@@ -376,29 +429,33 @@ GO
 INSERT INTO [dbo].[tbl_SAMPLE] (USERID) VALUES ('Siti')
 GO 5000
 INSERT INTO [dbo].[tbl_SAMPLE] (USERID) VALUES ('Didi')
-GO 1000
+GO 10000
 INSERT INTO [dbo].[tbl_SAMPLE] (USERID) VALUES ('Ruly')
-GO 500
+GO 5000
 INSERT INTO [dbo].[tbl_SAMPLE] (USERID) VALUES ('Dina')
-GO 250
+GO 2500
 INSERT INTO [dbo].[tbl_SAMPLE] (USERID) VALUES ('Edo')
-GO 200
+GO 2000
 INSERT INTO [dbo].[tbl_SAMPLE] (USERID) VALUES ('Yani')
-GO 150
+GO 1500
 INSERT INTO [dbo].[tbl_SAMPLE] (USERID) VALUES ('Badu')
-GO 100
+GO 1000
 INSERT INTO [dbo].[tbl_SAMPLE] (USERID) VALUES ('Budi')
-GO 50
+GO 5000
 INSERT INTO [dbo].[tbl_SAMPLE] (USERID) VALUES ('Randy')
-GO 10
+GO 1000
 
---- #12 
+--- #18C 
 -- SHOW FRAGMENTATION.. Should be high
 DBCC SHOWCONTIG ('tbl_Sample') WITH FAST, TABLERESULTS, ALL_INDEXES, NO_INFOMSGS
 GO 
 
 
---- #13 
+--- #19A
+-- SHOW FRAGMENTATION.. Should be low 
+DBCC SHOWCONTIG ('tbl_Sample2') WITH FAST, TABLERESULTS, ALL_INDEXES, NO_INFOMSGS
+GO 
+--- #19B
 ---- Remove and insert some data to introduce fragmentation (table 2)
 DELETE FROM [dbo].[tbl_SAMPLE2] WHERE TOKENS > 20000 AND TOKENS < 55000
 GO
@@ -407,30 +464,32 @@ GO
 INSERT INTO [dbo].[tbl_SAMPLE2] (USERID) VALUES ('Siti')
 GO 5000
 INSERT INTO [dbo].[tbl_SAMPLE2] (USERID) VALUES ('Didi')
-GO 1000
+GO 10000
 INSERT INTO [dbo].[tbl_SAMPLE2] (USERID) VALUES ('Ruly')
-GO 500
+GO 5000
 INSERT INTO [dbo].[tbl_SAMPLE2] (USERID) VALUES ('Dina')
-GO 250
+GO 2500
 INSERT INTO [dbo].[tbl_SAMPLE2] (USERID) VALUES ('Edo')
-GO 200
+GO 2000
 INSERT INTO [dbo].[tbl_SAMPLE2] (USERID) VALUES ('Yani')
-GO 150
+GO 1500
 INSERT INTO [dbo].[tbl_SAMPLE2] (USERID) VALUES ('Badu')
-GO 100
+GO 1000
 INSERT INTO [dbo].[tbl_SAMPLE2] (USERID) VALUES ('Budi')
-GO 50
+GO 500
 INSERT INTO [dbo].[tbl_SAMPLE2] (USERID) VALUES ('Randy')
-GO 10
+GO 100
   
---- #14 
+--- #19C  
 -- SHOW FRAGMENTATION.. Should be high
 DBCC SHOWCONTIG ('tbl_Sample2') WITH FAST, TABLERESULTS, ALL_INDEXES, NO_INFOMSGS
 GO 
 
 
+--- #19 TBD
+
 -------------------------------------------------------
---- #15 SHRINK Database. This will fragment the data even more.
+--- #20 SHRINK Database. This will fragment the data even more.
 							DBCC SHRINKFILE (DemoFragment, 1);
 							GO
 
@@ -445,7 +504,7 @@ GO
 
 
 -------------------------------------------------------
---- #16 Defrag TABLE to fix the fragmentation issue
+--- #21 Defrag TABLE to fix the fragmentation issue
 ALTER INDEX idx_TOKENS ON tbl_SAMPLE REBUILD ---WITH ( ONLINE = ON ) ---Online only on Enterprise Edition
 ALTER INDEX idx_NAME ON tbl_SAMPLE REBUILD ---WITH ( ONLINE = ON )
 ALTER INDEX idx_TIMEINSERTED ON tbl_SAMPLE REBUILD ---WITH ( ONLINE = ON )
@@ -457,7 +516,7 @@ ALTER INDEX idx_TIMEINSERTED ON tbl_SAMPLE2 REBUILD ---WITH ( ONLINE = ON )
 
 
 -------------------------------------------------------
---- #17 
+--- #22 
 -- SHOW FRAGMENTATION AGAIN.. Should be much lower after index rebuild
 DBCC SHOWCONTIG ('tbl_Sample') WITH FAST, TABLERESULTS, ALL_INDEXES, NO_INFOMSGS
 GO 
@@ -466,7 +525,7 @@ DBCC SHOWCONTIG ('tbl_Sample2') WITH FAST, TABLERESULTS, ALL_INDEXES, NO_INFOMSG
 GO 
 
 -------------------------------------------------------
-							--- #18 Explore statistics
+							--- #23 Explore statistics
 							-- Get statistics metadata from the table --- notice of one auto_created stats exist
 							SELECT * from sys.stats where object_id IN (select object_id from sys.stats where name = N'idx_TIMEINSERTED')
 							GO
@@ -484,7 +543,7 @@ GO
 
 
 -------------------------------------------------------
-										-- #19 Update statistics 
+										-- #24 Update statistics 
 										UPDATE STATISTICS tbl_Sample
 											WITH FULLSCAN, NORECOMPUTE;
 										GO
@@ -507,7 +566,7 @@ GO
 							GO
 
 
-							-- #20 Get statistical details from the table within the index
+							-- #25 Get statistical details from the table within the index
 							DBCC SHOW_STATISTICS (tbl_SAMPLE, idx_NAME)
 							GO
 							DBCC SHOW_STATISTICS (tbl_SAMPLE, idx_TIMEINSERTED)
@@ -526,14 +585,19 @@ GO
 
 
 -------------------------------------------------------
--- #21
+---TODO: Explore missing indexes
+---   Unused Indexes
+---   Redundant& Duplicate Indexex
+-------------------------------------------------------
+
+-- #26
 -- Drop table 
 --- DROP TABLE [dbo].[tbl_SAMPLE] 
 --- GO
 --- DROP TABLE [dbo].[tbl_SAMPLE2] 
 --- GO
 
--- #22
+-- #27
 --Drop Database
 --- DROP DATABASE [DemoFragment]
 
