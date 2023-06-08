@@ -303,24 +303,24 @@ SET STATISTICS XML OFF
 SET STATISTICS TIME OFF
 
 
---- #13 drop indexes to go with compression demo 
-DROP INDEX [idx_NAME] ON [dbo].[tbl_SAMPLE]
-GO
-DROP INDEX [idx_TIMEINSERTED] ON [dbo].[tbl_SAMPLE]
-GO
-DROP INDEX [idx_TOKENS] ON [dbo].[tbl_SAMPLE]
-GO
-DROP INDEX [idx_NAME] ON [dbo].[tbl_SAMPLE2]
-GO
-DROP INDEX [idx_TIMEINSERTED] ON [dbo].[tbl_SAMPLE2]
-GO
-DROP INDEX [idx_TOKENS] ON [dbo].[tbl_SAMPLE2]
-GO
+--- #13 drop indexes to exagerate compression demo result (optional) 
+---DROP INDEX [idx_NAME] ON [dbo].[tbl_SAMPLE]
+---GO
+---DROP INDEX [idx_TIMEINSERTED] ON [dbo].[tbl_SAMPLE]
+---GO
+---DROP INDEX [idx_TOKENS] ON [dbo].[tbl_SAMPLE]
+---GO
+---DROP INDEX [idx_NAME] ON [dbo].[tbl_SAMPLE2]
+---GO
+---DROP INDEX [idx_TIMEINSERTED] ON [dbo].[tbl_SAMPLE2]
+---GO
+---DROP INDEX [idx_TOKENS] ON [dbo].[tbl_SAMPLE2]
+---GO
 
 
 ---- #14 Storage compression
 -------------------------------------------------------
---- Review potential disk space saving by compression
+--- Review potential disk space saving by compression (check saving of Table 1 vs Table 2)
 
 EXEC sp_estimate_data_compression_savings 'dbo', 'tbl_SAMPLE', NULL, NULL, 'ROW' ;  
 GO
@@ -486,8 +486,6 @@ DBCC SHOWCONTIG ('tbl_Sample2') WITH FAST, TABLERESULTS, ALL_INDEXES, NO_INFOMSG
 GO 
 
 
---- #19 TBD
-
 -------------------------------------------------------
 --- #20 SHRINK Database. This will fragment the data even more.
 							DBCC SHRINKFILE (DemoFragment, 1);
@@ -504,6 +502,7 @@ GO
 
 
 -------------------------------------------------------
+--- Note: Rerun Create index script as on section 7 & 8, if dropped on section 13
 --- #21 Defrag TABLE to fix the fragmentation issue
 ALTER INDEX idx_TOKENS ON tbl_SAMPLE REBUILD ---WITH ( ONLINE = ON ) ---Online only on Enterprise Edition
 ALTER INDEX idx_NAME ON tbl_SAMPLE REBUILD ---WITH ( ONLINE = ON )
