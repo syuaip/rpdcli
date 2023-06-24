@@ -101,6 +101,14 @@ GO 1500
 INSERT INTO [dbo].[tbl_SAMPLE2] (USERID) VALUES ('Farhat')
 GO 5000
 
+----- check table content 
+select count(*) as TotalRow from DemoFragment.dbo.tbl_SAMPLE;
+select TOP 5 * from DemoFragment.dbo.tbl_SAMPLE order by TIMEINSERTED DESC; 
+
+select count(*) as TotalRow from DemoFragment.dbo.tbl_SAMPLE2;
+select TOP 5 * from DemoFragment.dbo.tbl_SAMPLE2 order by TIMEINSERTED DESC; 
+
+	
 -------------------------------------------------------
 --- #4B verify space being used by tables. note the row numbers, data and index size
 sp_spaceused tbl_Sample
