@@ -170,6 +170,18 @@ IF @Load <10 SELECT USERID FROM [dbo].[tbl_SAMPLE2] WHERE TOKENS = @Load * @Load
 END
 GO
 
+-- Query to Keep CPU Busy for 180 Seconds
+CREATE PROCEDURE IntroduceCPULoad 
+AS
+BEGIN
+SET NOCOUNT ON;
+DECLARE @T DATETIME, @F BIGINT;
+SET @T = GETDATE();
+WHILE DATEADD(SECOND,180,@T)>GETDATE()
+SET @F=POWER(2,30);
+END
+GO
+
 
 -------------------------------------------------------
 --- #6 Get baseline query performance data
