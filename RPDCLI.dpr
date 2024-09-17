@@ -465,6 +465,18 @@ begin
                                 WriteLn(fileRDIPDCXML, '<Counter>\MSAS15:Storage Engine Query\*</Counter>');
                                 WriteLn(fileRDIPDCXML, '<Counter>\MSAS15:Threads\*</Counter>');
 
+                                // SQL 2022
+                                WriteLn(fileRDIPDCXML, '<Counter>\MSAS16:Cache\*</Counter>');
+                                WriteLn(fileRDIPDCXML, '<Counter>\MSAS16:Connection\*</Counter>');
+                                WriteLn(fileRDIPDCXML, '<Counter>\MSAS16:Locks\*</Counter>');
+                                WriteLn(fileRDIPDCXML, '<Counter>\MSAS16:MDX\*</Counter>');
+                                WriteLn(fileRDIPDCXML, '<Counter>\MSAS16:Memory\*</Counter>');
+                                WriteLn(fileRDIPDCXML, '<Counter>\MSAS16:Proc Aggregations\*</Counter>');
+                                WriteLn(fileRDIPDCXML, '<Counter>\MSAS16:Proc Indexes\*</Counter>');
+                                WriteLn(fileRDIPDCXML, '<Counter>\MSAS16:Processing\*</Counter>');
+                                WriteLn(fileRDIPDCXML, '<Counter>\MSAS16:Storage Engine Query\*</Counter>');
+                                WriteLn(fileRDIPDCXML, '<Counter>\MSAS16:Threads\*</Counter>');
+
                                 // bSSASDefaultCountersDeployed = True
                                 // End If
                               End
@@ -630,6 +642,18 @@ begin
                                 WriteLn(fileRDIPDCXML, '<CounterDisplayName>\MSAS15:Processing\*</CounterDisplayName>');
                                 WriteLn(fileRDIPDCXML, '<CounterDisplayName>\MSAS15:Storage Engine Query\*</CounterDisplayName>');
                                 WriteLn(fileRDIPDCXML, '<CounterDisplayName>\MSAS15:Threads\*</CounterDisplayName>');
+
+                                // SQL 2022
+                                WriteLn(fileRDIPDCXML, '<CounterDisplayName>\MSAS16:Cache\*</CounterDisplayName>');
+                                WriteLn(fileRDIPDCXML, '<CounterDisplayName>\MSAS16:Connection\*</CounterDisplayName>');
+                                WriteLn(fileRDIPDCXML, '<CounterDisplayName>\MSAS16:Locks\*</CounterDisplayName>');
+                                WriteLn(fileRDIPDCXML, '<CounterDisplayName>\MSAS16:MDX\*</CounterDisplayName>');
+                                WriteLn(fileRDIPDCXML, '<CounterDisplayName>\MSAS16:Memory\*</CounterDisplayName>');
+                                WriteLn(fileRDIPDCXML, '<CounterDisplayName>\MSAS16:Proc Aggregations\*</CounterDisplayName>');
+                                WriteLn(fileRDIPDCXML, '<CounterDisplayName>\MSAS16:Proc Indexes\*</CounterDisplayName>');
+                                WriteLn(fileRDIPDCXML, '<CounterDisplayName>\MSAS16:Processing\*</CounterDisplayName>');
+                                WriteLn(fileRDIPDCXML, '<CounterDisplayName>\MSAS16:Storage Engine Query\*</CounterDisplayName>');
+                                WriteLn(fileRDIPDCXML, '<CounterDisplayName>\MSAS16:Threads\*</CounterDisplayName>');
 
                                 // bSSASDefaultCountersDeployed = True
                                 // End If
