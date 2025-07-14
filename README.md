@@ -19,9 +19,9 @@ Tools for Windows Performance Data Collector Setup, Ops and Cleaning Up
 4) Change command prompt directory to the C:\PerfmonData directory
 5) Run *rpdcli -1* to register data collector
 6) Run *rpdcli -2* to start the data collector
-7) Let it running while the Windows box is having a load
+7) Let it running while the Windows box is having a load. If you have a performance issue, reproduce your issue in this step. 
 8) Run *rpdcli -3* to stop the data collector (or run *rpdcli -3 -debug* to keep temp files of the data collector)
-9) Check the collected performance data file (a file with .BLG file extention) by:
+9) Check the collected performance data file (a file with .BLG file extension) by:
     
     a. either analyze it manually using Perfmon tool
     
