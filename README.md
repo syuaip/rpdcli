@@ -4,7 +4,7 @@ Windows OS Performance Data Collector Command Line Tool
 # Notes
 Download the code from https://github.com/syuaip/rpdcli
 
-Download the binary from this github release section, or from http://awssg.reksadata.net/binary/rditools.zip
+Download the binary from this github release section, or from https://github.com/syuaip/SQLHC/releases/download/SQLHC/rditools.zip
 
 For these releases, binary was compiled with Delphi 7.0 Ultimate 4.453 on top of Windows XP VM.
 
