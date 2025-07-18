@@ -8,14 +8,14 @@
 # Copyright ©2016-2020, PT. Reksa Data Indonesia (Decommisioned)
 # Copyright ©2020-2022, Arief Nugraha (Release to Public - Apache License 2.0)
 # Purpose: Windows Performance Data Collector Setup, Ops and Cleaning Up
-# PowerShell conversion by Amazon Q
+# PowerShell conversion by Amazon Q - Limited testing result ok on Windows 10 without Debug flag on
 
 param(
     [Parameter(Position=0)]
     [string]$Action,
     
     [Parameter(Position=1)]
-    [switch]$Debug
+    [switch]$KeepTempFiles
 )
 
 # Global variables
@@ -1082,7 +1082,7 @@ function Main {
     }
     
     # Clean up temporary files unless debug mode is enabled
-    if (-not $Debug) {
+    if (-not $KeepTempFiles) {
         Remove-DataFiles
     }
     
