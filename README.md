@@ -13,7 +13,7 @@ Tools for Windows Performance Data Collector Setup, Ops and Cleaning Up
 
 # How-to-use
 
-1) Copy RPDCLI.exe to the Windows box which performance data is to be collected
+1) Copy RPDCLI.exe (or RPDCLI.ps1) to the Windows box which performance data is to be collected
 2) Put it on a working directory with enough disk space, e.g. *C:\PerfmonData* 
 3) Open an elevated Windows command prompt
 4) Change command prompt directory to the C:\PerfmonData directory
