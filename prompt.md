@@ -1,0 +1,1 @@
+analyze the content of file 'XXXXXXX_PAL_ANALYSIS.htm', dive deep on disk latencies, cpu load and sql server wait statistics, provide me list of critical findings based on priority, and suggest of what is/are the most likely root-cause(s) of the server issue.
